@@ -1,6 +1,8 @@
 require('dotenv').config();
 const express = require('express');
 const { GoogleGenerativeAI } = require('@google/generative-ai');
+const path = require("path");
+const favicon = require('serve-favicon');
 const app = express();
 const port = process.env.PORT || 8000;
 
@@ -8,7 +10,9 @@ const port = process.env.PORT || 8000;
 app.use(express.json());
 
 // Serve static files from the "public" folder
-app.use(express.static('public'));
+app.use(express.static(__dirname));
+const faviconPath = path.join(__dirname, 'favicon.ico');
+app.use(favicon(faviconPath));
 app.get('/favicon', (req, res) => {
   res.sendFile(`${__dirname}/favicon.ico`);
 });
