@@ -16,6 +16,9 @@ app.use(favicon(faviconPath));
 app.get('/favicon', (req, res) => {
   res.sendFile(`${__dirname}/favicon.ico`);
 });
+app.get('/', (req, res) => {
+  res.sendFile(`${__dirname}/index.html`);
+});
 // Get API key from environment variables
 const apiKey = process.env.GOOGLE_API_KEY;
 if (!apiKey) {
