@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title> Chatbot Application</title>
+  <style>
+    /* Basic reset and styling */
+    body {
+      font-family: Arial, sans-serif;
+      background-color: #f2f2f2;
+      margin: 0;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+    }
+
+    .chat-container {
+      background: #fff;
+      width: 400px;
+      max-width: 100%;
+      border-radius: 8px;
+      overflow: hidden;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+      display: flex;
+      flex-direction: column;
+    }
+    
+    .chat-header {
+      background: #007BFF;
+      color: #fff;
+      padding: 15px;
+      text-align: center;
+    }
+    
+    .chat-box {
+      padding: 20px;
+      height: 300px;
+      overflow-y: auto;
+      border-bottom: 1px solid #ddd;
+      display: flex;
+      flex-direction: column;
+    }
+    
+    .chat-message {
+      margin-bottom: 15px;
+      padding: 10px;
+      border-radius: 4px;
+      max-width: 80%;
+      word-wrap: break-word;
+    }
+    
+    .chat-message.user {
+      background-color: #dcf8c6;
+      align-self: flex-end;
+      text-align: right;
+    }
+    
+    .chat-message.bot {
+      background-color: #f1f0f0;
+      align-self: flex-start;
+      text-align: left;
+    }
+    
+    .chat-form {
+      display: flex;
+      border-top: 1px solid #ddd;
+    }
+    
+    .chat-form input {
+      flex: 1;
+      padding: 10px;
+      border: none;
+      font-size: 16px;
+    }
+    
+    .chat-form button {
+      padding: 10px 15px;
+      border: none;
+      background: #007BFF;
+      color: #fff;
+      font-size: 16px;
+      cursor: pointer;
+    }
+    
+    .chat-form button:hover {
+      background: #0056b3;
+    }
+  </style>
+</head>
+<body>
+  <div class="chat-container">
+    <div class="chat-header">
+      <h2> Chatbot</h2>
+    </div>
+    <div id="chat-box" class="chat-box">
+      <!-- Chat messages will appear here -->
+    </div>
+    <form id="chat-form" class="chat-form">
+      <input type="text" id="message" placeholder="Type your message..." autocomplete="off" required>
+      <button type="submit">Send</button>
+    </form>
+  </div>
+
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      const chatForm = document.getElementById('chat-form');
+      const chatBox = document.getElementById('chat-box');
+      const messageInput = document.getElementById('message');
+
+      // Handle form submission
+      chatForm.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const message = messageInput.value.trim();
+        if (!message) return;
+
+        // Append user's message to the chat box
+        appendMessage('user', message);
+        messageInput.value = '';
+
+        // Send the message to the backend API
+        try {
+          const response = await fetch('/api/chat', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({ message })
+          });
+          const data = await response.json();
+          if (data.response) {
+            appendMessage('bot', data.response);
+          } else {
+            appendMessage('bot', 'Sorry, something went wrong.');
+          }
+        } catch (error) {
+          console.error('Error calling API:', error);
+          appendMessage('bot', 'Error connecting to the server.');
+        }
+      });
+
+      // Helper function to append messages to the chat box
+      function appendMessage(sender, text) {
+        const messageDiv = document.createElement('div');
+        messageDiv.classList.add('chat-message', sender);
+        messageDiv.textContent = text;
+        chatBox.appendChild(messageDiv);
+        chatBox.scrollTop = chatBox.scrollHeight;
+      }
+    });
+  </script>
+</body>
+</html>
